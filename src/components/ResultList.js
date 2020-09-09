@@ -1,5 +1,6 @@
 import React from "react";
 import { Row, Col } from "antd";
+import { SyncOutlined } from "@ant-design/icons";
 
 const Result = ({ result, openPopup, setToggle }) => {
   return (
@@ -21,7 +22,14 @@ const Result = ({ result, openPopup, setToggle }) => {
 
 function ResultList(props) {
   if (props.results[0] === 1) {
-    return <div>영화없음.</div>;
+    return (
+      <div className="no-result">
+        <SyncOutlined spin /> <br />
+        No results were found for your search.
+        <br />
+        Please <span style={{ color: "#ff9800" }}>check the words.</span>
+      </div>
+    );
   } else
     return (
       <div className="resultlist-container">

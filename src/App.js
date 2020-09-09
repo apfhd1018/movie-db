@@ -4,6 +4,8 @@ import Search from "./components/Search";
 import Axios from "axios";
 import ResultList from "./components/ResultList";
 import Popup from "./components/Popup";
+import Login from "./components/Login";
+import Register from "./components/Register";
 
 function App() {
   const [moviedb, setMoviedb] = useState({
@@ -13,6 +15,11 @@ function App() {
   });
   // popup창 토글
   const [toggle, setToggle] = useState(false);
+  // login Display 속성 변경
+  const [login, setLogin] = useState("none");
+  // register Display 띄우기
+  const [register, setRegister] = useState(false);
+
   // search 검색창 포커스
   const inputRef = useRef();
 
@@ -57,7 +64,7 @@ function App() {
     });
     setToggle(false);
   };
-  // 메인 타이틀 텍스트 누르면 화면 리셋 후 인풋 포커싱
+  // 메인 타이틀 텍스트 누르면 화면 리셋 후 input에 포커싱
   const screenReset = () => {
     setMoviedb({
       title: "",
@@ -67,15 +74,34 @@ function App() {
     inputRef.current.focus();
     inputRef.current.value = "";
   };
+  // 로그인 화면 열기
+  const openLogin = () => {
+    setLogin("block");
+  };
+  // 회원가입 화면 열기
+  const openRegister = () => {
+    setLogin("none");
+    setRegister(true);
+  };
 
   return (
     <div className="moviedb">
+      <Login
+        login={login}
+        setLogin={setLogin}
+        openRegister={openRegister}
+        setRegister={setRegister}
+      />
+      {register === true ? (
+        <Register setRegister={setRegister} setLogin={setLogin} />
+      ) : null}
       <header>
         <div className="nav">
-          <a href="">Login</a>
-          <a href="">My Favorite List</a>
+          <span onClick={openLogin}>Sign-In</span>
+          <span>My Favorite List</span>
         </div>
       </header>
+
       <div className="page-title">
         <h1 onClick={screenReset}>Movie Database</h1>
       </div>
