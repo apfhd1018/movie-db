@@ -1,6 +1,11 @@
 const router = require("express").Router();
 let User = require("../models/user.model");
-const { registerValidation } = require("../validation/validation");
+const {
+  registerValidation,
+  loginValidation,
+} = require("../validation/validation");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 router.route("/").get((req, res) => {
   User.find()
@@ -8,30 +13,57 @@ router.route("/").get((req, res) => {
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-router.route("/add").post(async (req, res) => {
+// ==================유저 등록 ===================
+router.post("/add", async (req, res) => {
   //유저 생성 전 Validation
   const { error } = registerValidation(req.body);
-  //유저 등록 할 때 조건 만족 안할시 에러메세지 보냄
+  //유저 등록 할 때 Validation조건 만족 안할시 에러메세지 보냄
   if (error) return res.status(400).send(error.details[0].message);
 
-  // username이 db에 존재하는지 체크
+  // username이 DB에 존재하는지 체크
   const usernameExist = await User.findOne({ username: req.body.username });
   if (usernameExist) return res.status(400).send("username already exists.");
+  //Hash Password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
+  // Create a new user
   console.log("========= api =========");
   console.log(req.body);
   const username = req.body.username;
-  const password = req.body.password;
+  const password = hashedPassword;
 
   const newUser = new User({ username, password });
 
   try {
     await newUser.save();
-    res.json("User added!");
+    res.send("User was added!");
   } catch (err) {
     res.status(400).json("Error: " + err);
   }
 });
+// =================유저등록 끝===================
+
+// =============로그인===============
+
+router.post("/login", async (req, res) => {
+  //로그인 전 Validation
+  const { error } = loginValidation(req.body);
+  //로그인 할 때 Validation조건 만족 안할시 에러메세지 보냄
+  if (error) return res.status(400).send(error.details[0].message);
+  // username이 DB에 없으면 에러메세지 보냄
+  const user = await User.findOne({ username: req.body.username });
+  if (!user) return res.status(400).send("Username is not found.");
+  // 비밀번호 검사
+  const validPwd = await bcrypt.compare(req.body.password, user.password);
+  if (!validPwd) return res.status(400).send("Invalid Password.");
+
+  // 토큰 발급
+  const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+  res.header("auth-token", token).send("Logged in!");
+});
+
+// ==============로그인 끝=============
 
 // id통한 유저 검색
 router.route("/:id").get((req, res) => {
