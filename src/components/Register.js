@@ -1,10 +1,11 @@
 import React from "react";
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button, Alert } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import axios from "axios";
 
 const layout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 20 },
+  labelCol: { span: 5 },
+  wrapperCol: { span: 19 },
 };
 const tailLayout = {
   wrapperCol: { span: 24 },
@@ -14,11 +15,27 @@ const Register = ({ setRegister, setLogin }) => {
   const closeRegister = () => {
     setRegister(false);
   };
+
+  // onSubmit 이벤트에서 async await => try, catch하지 않을경우 에러발생시 화면나감
+  const onSubmit = async (values) => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/users/add",
+        values
+      );
+      alert("You have successfully registered as a member. Please log in.");
+      setRegister(false);
+      setLogin("block");
+    } catch (error) {
+      alert("Please use a different ID!");
+    }
+  };
+
   return (
     <div className="login">
       <div className="login-box" style={{ position: "relative" }}>
         <h2>Create account</h2>
-        <Form {...layout} name="basic">
+        <Form {...layout} name="basic" onFinish={onSubmit}>
           <Form.Item
             label="Username"
             name="username"

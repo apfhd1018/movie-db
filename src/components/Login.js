@@ -15,9 +15,9 @@ const Login = ({ login, setLogin, openRegister }) => {
     console.log("Success:", values);
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
+  // const onFinishFailed = (errorInfo) => {
+  //   console.log("Failed:", errorInfo);
+  // };
   //   로그인화면 닫기
   const closeLogin = () => {
     setLogin("none");
