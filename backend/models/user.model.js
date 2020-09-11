@@ -9,11 +9,13 @@ const userSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
+      min: 3,
     },
     password: {
       type: String,
       trim: true,
       required: true,
+      min: 3,
     },
   },
   {

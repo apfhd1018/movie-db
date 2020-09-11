@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Input, Button, Alert } from "antd";
+import { Form, Input, Button } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import axios from "axios";
 
@@ -27,7 +27,9 @@ const Register = ({ setRegister, setLogin }) => {
       setRegister(false);
       setLogin("block");
     } catch (error) {
-      alert("Please use a different ID!");
+      alert(
+        "Is your ID or password more than 3 characters long?\nOr your ID already exists."
+      );
     }
   };
 
@@ -39,7 +41,12 @@ const Register = ({ setRegister, setLogin }) => {
           <Form.Item
             label="Username"
             name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
+            rules={[
+              {
+                required: true,
+                message: "Please input your username!(At least 3 string.)",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -47,7 +54,12 @@ const Register = ({ setRegister, setLogin }) => {
           <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!(At least 3 string.)",
+              },
+            ]}
           >
             <Input.Password />
           </Form.Item>
