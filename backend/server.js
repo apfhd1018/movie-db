@@ -13,8 +13,8 @@ app.use(express.json()); // bodyParser
 
 const uri = process.env.ATLAS_URI;
 mongoose.connect(uri, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
+  useNewUrlParser: true, // 문자열 구문 분석기
+  useCreateIndex: true, //createIndex 메소드 호출
   useUnifiedTopology: true,
 });
 const connection = mongoose.connection;

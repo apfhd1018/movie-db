@@ -6,16 +6,89 @@ const {
 } = require("../validation/validation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const verifyToken = require("./verifyToken");
 
-router.route("/").get((req, res) => {
+//연습@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+const posts = [
+  {
+    username: "Kyle",
+    title: "Post 1",
+  },
+  {
+    username: "Jim",
+    title: "Post 2",
+  },
+];
+
+router.get("/posts", authenticateToken, (req, res) => {
+  res.json(posts.filter((post) => post.username === req.user.name));
+});
+// 생성되는 refresh 토큰을 배열에 담음
+let refreshTokens = [];
+// refresh토큰에 요청
+router.post("/token", (req, res) => {
+  const refreshToken = req.body.token;
+  if (refreshToken == null) return res.sendStatus(401);
+  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+  // verify를 통해 권한을 확인한다.
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    const accessToken = generateAccessToken({ name: user.name });
+    res.json({ accessToken: accessToken });
+  });
+});
+router.post("/posts/login", (req, res) => {
+  // Authenticate User
+
+  const username = req.body.username;
+  const user = { name: username };
+  // accessToken 생성
+  const accessToken = generateAccessToken(user);
+  // refreshToken 생성
+  const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: "1h",
+  });
+  refreshTokens.push(refreshToken);
+  res.json({ accessToken: accessToken, refreshToken: refreshToken });
+});
+
+function generateAccessToken(user) {
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "15s",
+  });
+}
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+router.delete("/posts/logout", (req, res) => {
+  refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
+  res.sendStatus(204);
+});
+
+// 연습끝@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+router.get("/", (req, res) => {
+  // try {
+  //   await User.find();
+  //   res.json(users);
+  // } catch (err) {
+  //   res.status(400).json("Error: " + err);
+  // }
   User.find()
     .then((users) => res.json(users))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-// ==================유저 등록 ===================
+// =========================유저 등록 ==========================
 router.post("/add", async (req, res) => {
-  //유저 생성 전 Validation
+  //유저 생성 전 Validation @hapi/joi
   const { error } = registerValidation(req.body);
   //유저 등록 할 때 Validation조건 만족 안할시 에러메세지 보냄
   if (error) return res.status(400).send(error.details[0].message);
@@ -37,14 +110,14 @@ router.post("/add", async (req, res) => {
 
   try {
     await newUser.save();
-    res.send("User was added!");
+    res.send("User added!");
   } catch (err) {
     res.status(400).json("Error: " + err);
   }
 });
-// =================유저등록 끝===================
+// ========================유저등록 끝==========================
 
-// =============로그인===============
+// ====================로그인======================
 
 router.post("/login", async (req, res) => {
   //로그인 전 Validation
@@ -59,26 +132,41 @@ router.post("/login", async (req, res) => {
   if (!validPwd) return res.status(400).send("Invalid Password.");
 
   // 토큰 발급
-  const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-  res.header("auth-token", token).send("Logged in!");
+  const token = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "60m",
+  });
+  res.header("auth-token", token).send(token);
 });
 
-// ==============로그인 끝=============
+// =====================로그인 끝=======================
 
-// id통한 유저 검색
-router.route("/:id").get((req, res) => {
+// =====================로그아웃========================
+
+router.delete("/logout", async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) send("there is no token");
+    const userId = await verifyToken(token);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// =====================로그아웃========================
+// ============id 통한 유저 검색, 삭제, 업데이트================
+router.get("/:id", (req, res) => {
   User.findById(req.params.id)
     .then((user) => res.json(user))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-router.route("/:id").delete((req, res) => {
+router.delete("/:id", (req, res) => {
   User.findById(req.params.id)
     .then(() => res.json("User deleted."))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-router.route("/update/:id").post((req, res) => {
+router.post("/update/:id", (req, res) => {
   User.findById(req.params.id).then((user) => {
     user.username = req.body.username;
     user.password = req.body.password;
@@ -89,5 +177,6 @@ router.route("/update/:id").post((req, res) => {
       .catch((err) => res.status(400).json("Error: " + err));
   });
 });
+// ============id 통한 유저 검색, 삭제, 업데이트 끝================
 
 module.exports = router;
