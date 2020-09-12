@@ -6,74 +6,15 @@ const {
 } = require("../validation/validation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const verifyToken = require("./verifyToken");
-
-//연습@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-const posts = [
-  {
-    username: "Kyle",
-    title: "Post 1",
-  },
-  {
-    username: "Jim",
-    title: "Post 2",
-  },
-];
-
-router.get("/posts", authenticateToken, (req, res) => {
-  res.json(posts.filter((post) => post.username === req.user.name));
-});
-// 생성되는 refresh 토큰을 배열에 담음
-let refreshTokens = [];
-// refresh토큰에 요청
-router.post("/token", (req, res) => {
-  const refreshToken = req.body.token;
-  if (refreshToken == null) return res.sendStatus(401);
-  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
-  // verify를 통해 권한을 확인한다.
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    const accessToken = generateAccessToken({ name: user.name });
-    res.json({ accessToken: accessToken });
-  });
-});
-router.post("/posts/login", (req, res) => {
-  // Authenticate User
-
-  const username = req.body.username;
-  const user = { name: username };
-  // accessToken 생성
-  const accessToken = generateAccessToken(user);
-  // refreshToken 생성
-  const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "1h",
-  });
-  refreshTokens.push(refreshToken);
-  res.json({ accessToken: accessToken, refreshToken: refreshToken });
-});
+const authenticateToken = require("./authenticateToken");
 
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "15s",
   });
 }
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (token == null) return res.sendStatus(401);
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-}
-router.delete("/posts/logout", (req, res) => {
-  refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
-  res.sendStatus(204);
-});
-
-// 연습끝@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// ==================등록된 유저 찾기====================
 router.get("/", (req, res) => {
   // try {
   //   await User.find();
@@ -85,6 +26,7 @@ router.get("/", (req, res) => {
     .then((users) => res.json(users))
     .catch((err) => res.status(400).json("Error: " + err));
 });
+// ==================등록된 유저 찾기 끝===================
 
 // =========================유저 등록 ==========================
 router.post("/add", async (req, res) => {
@@ -100,7 +42,7 @@ router.post("/add", async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-  // Create a new user
+  // 새로운 유저 생성
   console.log("========= api =========");
   console.log(req.body);
   const username = req.body.username;
@@ -120,7 +62,7 @@ router.post("/add", async (req, res) => {
 // ====================로그인======================
 
 router.post("/login", async (req, res) => {
-  //로그인 전 Validation
+  //로그인 전 Validation @hapi/joi
   const { error } = loginValidation(req.body);
   //로그인 할 때 Validation조건 만족 안할시 에러메세지 보냄
   if (error) return res.status(400).send(error.details[0].message);
@@ -131,25 +73,52 @@ router.post("/login", async (req, res) => {
   const validPwd = await bcrypt.compare(req.body.password, user.password);
   if (!validPwd) return res.status(400).send("Invalid Password.");
 
-  // 토큰 발급
-  const token = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "60m",
-  });
-  res.header("auth-token", token).send(token);
+  // accessToken 생성
+  const accessToken = generateAccessToken({ _id: user._id });
+  // refreshToken 생성
+  const refreshToken = jwt.sign(
+    { _id: user._id },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: "1h",
+    }
+  );
+  // 발급된 refreshToken을 refreshTokens 배열에 담는다
+  refreshTokens.push(refreshToken);
+  res.json({ accessToken: accessToken, refreshToken: refreshToken });
 });
-
 // =====================로그인 끝=======================
+
+// ================== refreshToken을 통해 accessToken 갱신 ==================
+// refreshToken을 담을 배열 선언
+let refreshTokens = [];
+// accessToken 갱신 경로 지정
+router.post("/token", (req, res) => {
+  const refreshToken = req.body.token;
+  if (refreshToken == null)
+    return res.status(401).send("refreshToken is not exists.");
+  if (!refreshTokens.includes(refreshToken))
+    return res
+      .status(403)
+      .send("refreshToken is not put into the refreshTokens arrangement.");
+  // verify를 통해 refreshToken의 권한 확인
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) return res.status(403).send("Invalid refresh token!");
+    const accessToken = generateAccessToken({ username: user.username });
+    res.json({ accessToken: accessToken });
+  });
+});
+// ================== refreshToken을 통해 accessToken 갱신 끝 ==================
+
+router.get("/secret", authenticateToken, (req, res) => {
+  res.json("You have a authenticatation!");
+});
 
 // =====================로그아웃========================
 
-router.delete("/logout", async (req, res) => {
-  try {
-    const { token } = req.body;
-    if (!token) send("there is no token");
-    const userId = await verifyToken(token);
-  } catch (error) {
-    next(error);
-  }
+router.delete("/logout", (req, res) => {
+  refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
+  res.send("Logged out!");
 });
 
 // =====================로그아웃========================

@@ -24,10 +24,10 @@ connection.once("open", () => {
 
 // Import Route
 const usersRouter = require("./routes/users");
-const privateRoute = require("./routes/privatePlace");
+const privateRouter = require("./routes/private");
 
 app.use("/api/users", usersRouter);
-app.use("/api/private", privateRoute);
+app.use("/api/private", privateRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

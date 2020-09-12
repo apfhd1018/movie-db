@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Input, Button, Divider } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import axios from "axios";
 
 const layout = {
   labelCol: { span: 24 },
@@ -11,16 +12,22 @@ const tailLayout = {
 };
 
 const Login = ({ login, setLogin, openRegister }) => {
-  const onFinish = (values) => {
-    console.log("Success:", values);
-  };
-
-  // const onFinishFailed = (errorInfo) => {
-  //   console.log("Failed:", errorInfo);
-  // };
-  //   로그인화면 닫기
+  // 닫기창 누르면 로그인창 닫힘
   const closeLogin = () => {
     setLogin("none");
+  };
+  // 로그인 요청
+  const onLogin = async (values) => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/users/login",
+        values
+      );
+      alert("Login successed!");
+      setLogin("none");
+    } catch (err) {
+      alert("Login failed");
+    }
   };
 
   return (
@@ -31,7 +38,7 @@ const Login = ({ login, setLogin, openRegister }) => {
           name="normal_login"
           className="login-form"
           initialValues={{ remember: true }}
-          onFinish={onFinish}
+          onFinish={onLogin}
           {...layout}
         >
           <Form.Item
