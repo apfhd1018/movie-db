@@ -11,7 +11,7 @@ const tailLayout = {
   wrapperCol: { span: 24 },
 };
 
-const Login = ({ login, setLogin, openRegister }) => {
+const Login = ({ login, setLogin, openRegister, setChange }) => {
   // 닫기창 누르면 로그인창 닫힘
   const closeLogin = () => {
     setLogin("none");
@@ -38,6 +38,7 @@ const Login = ({ login, setLogin, openRegister }) => {
 
       alert("Login successed!");
       setLogin(false);
+      setChange(false);
     } catch (err) {
       alert("Login failed");
       console.log(err);

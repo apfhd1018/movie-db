@@ -22,6 +22,8 @@ function App() {
   const [register, setRegister] = useState(false);
   // favorite Display 띄우기
   const [favorite, setFavorite] = useState(false);
+  // 로그인 => 로그아웃 글자 변경
+  const [change, setChange] = useState(true);
 
   // search 검색창 포커스
   const inputRef = useRef();
@@ -103,6 +105,7 @@ function App() {
       // 에러발생안하면 Favorite리스트 열고 닫기 가능
       setFavorite(!favorite);
     } catch (err) {
+      alert("Please Log in!");
       // console.log("토큰갱신에러", err);
       // 세션스토리지에 담긴 refreshToken을 찾는다
       const refreshToken = sessionStorage.getItem("refreshToken");
@@ -124,6 +127,21 @@ function App() {
       // console.log("2번째응답", res2);
     }
   };
+  // 로그아웃 요청
+  const logout = async () => {
+    const refreshToken = sessionStorage.getItem("refreshToken");
+    try {
+      const res = await axios.delete("http://localhost:5000/api/users/logout", {
+        token: refreshToken,
+      });
+      sessionStorage.removeItem("accessToken");
+      sessionStorage.removeItem("refreshToken");
+      setChange(true);
+      console.log("로그아웃 res : ", res);
+    } catch (err) {
+      console.log("로그아웃 에러", err);
+    }
+  };
 
   return (
     <div className="moviedb">
@@ -133,6 +151,7 @@ function App() {
           setLogin={setLogin}
           openRegister={openRegister}
           setRegister={setRegister}
+          setChange={setChange}
         />
       ) : null}
 
@@ -141,7 +160,14 @@ function App() {
       ) : null}
       <header>
         <div className="nav">
-          <span onClick={openLogin}>Sign-In</span>
+          {/* 로그인시 글자 바뀜 */}
+          {change === true ? (
+            <span onClick={openLogin}>Sign-In</span>
+          ) : (
+            <span onClick={logout}>Log-Out</span>
+          )}
+          {/* <span onClick={openLogin}>Sign-In</span>
+          <span>Log-Out</span> */}
 
           <span onClick={openFavorite}>My Favorite List</span>
         </div>
