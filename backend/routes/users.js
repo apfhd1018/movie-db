@@ -10,7 +10,7 @@ const authenticateToken = require("./authenticateToken");
 
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15s",
+    expiresIn: "600s",
   });
 }
 
@@ -94,6 +94,7 @@ router.post("/login", async (req, res) => {
 let refreshTokens = [];
 // accessToken 갱신 경로 지정
 router.post("/token", (req, res) => {
+  // client쪽에서 token이라는 변수로 refreshToken을 전달
   const refreshToken = req.body.token;
   if (refreshToken == null)
     return res.status(401).send("refreshToken is not exists.");

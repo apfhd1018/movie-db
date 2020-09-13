@@ -23,15 +23,29 @@ const Login = ({ login, setLogin, openRegister }) => {
         "http://localhost:5000/api/users/login",
         values
       );
+
+      const accessToken = sessionStorage.setItem(
+        "accessToken",
+        res.data.accessToken
+      );
+      const refreshToken = sessionStorage.setItem(
+        "refreshToken",
+        res.data.refreshToken
+      );
+      console.log("요청성공", res.data);
+      console.log("엑세스토큰", accessToken);
+      console.log("리프레시토큰", refreshToken);
+
       alert("Login successed!");
-      setLogin("none");
+      setLogin(false);
     } catch (err) {
       alert("Login failed");
+      console.log(err);
     }
   };
 
   return (
-    <div className="login" style={{ display: `${login}` }}>
+    <div className="login">
       <div className="login-box">
         <h2>Enjoy Our Movie Database!</h2>
         <Form

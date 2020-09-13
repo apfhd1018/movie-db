@@ -25,7 +25,7 @@ const Register = ({ setRegister, setLogin }) => {
       );
       alert("You have successfully registered as a member. Please log in.");
       setRegister(false);
-      setLogin("block");
+      setLogin(true);
     } catch (error) {
       alert(
         "Is your ID or password more than 3 characters long?\nOr your ID already exists."
@@ -85,7 +85,7 @@ const Register = ({ setRegister, setLogin }) => {
           className="backToLogin"
           onClick={() => {
             setRegister(false);
-            setLogin("block");
+            setLogin(true);
           }}
         />
       </div>

@@ -234,3 +234,12 @@ header {
   background: #000;
   color: #fff;
 }
+/* -------------favorite------------- */
+.favorite {
+  position: fixed;
+  right: 0;
+  top: 14%;
+  width: 14%;
+  height: 100vh;
+  background: #fff;
+}
