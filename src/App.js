@@ -6,7 +6,7 @@ import ResultList from "./components/ResultList";
 import Popup from "./components/Popup";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Favorite from "./components/Favorite";
+import FavoritePage from "./components/FavoritePage";
 
 function App() {
   const [moviedb, setMoviedb] = useState({
@@ -88,8 +88,9 @@ function App() {
     setLogin(false);
     setRegister(true);
   };
-
-  // 로그인 이후 private 접근 경로 설정 ===================
+  //====================================
+  // 로그인 이후 private 접근 경로 설정
+  //====================================
   const openFavorite = async () => {
     try {
       // 세션스토리지에 담긴 accessToken을 찾는다
@@ -127,7 +128,9 @@ function App() {
       // console.log("2번째응답", res2);
     }
   };
+  //====================================
   // 로그아웃 요청
+  //====================================
   const logout = async () => {
     const refreshToken = sessionStorage.getItem("refreshToken");
     try {
@@ -176,7 +179,7 @@ function App() {
       <div className="page-title">
         <h1 onClick={screenReset}>Movie Database</h1>
       </div>
-      {favorite === true ? <Favorite /> : null}
+      {favorite === true ? <FavoritePage /> : null}
 
       <Search
         handleInput={handleInput}

@@ -29,6 +29,7 @@ const privateRouter = require("./routes/private");
 app.use("/api/users", usersRouter);
 app.use("/api/private", privateRouter);
 
+// listen 메소드가 실행될 때 첫번째 인자로 리스닝 성공하면 뒤 코드 실행
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });

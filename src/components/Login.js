@@ -23,7 +23,7 @@ const Login = ({ login, setLogin, openRegister, setChange }) => {
         "http://localhost:5000/api/users/login",
         values
       );
-
+      // 서버에서 res.json과 같은 형태로 전송을 해야 클라이언트에서 사용 가능!!
       const accessToken = sessionStorage.setItem(
         "accessToken",
         res.data.accessToken
@@ -32,11 +32,10 @@ const Login = ({ login, setLogin, openRegister, setChange }) => {
         "refreshToken",
         res.data.refreshToken
       );
-      console.log("요청성공", res.data);
-      console.log("엑세스토큰", accessToken);
-      console.log("리프레시토큰", refreshToken);
+      // const userId = sessionStorage.setItem("userId", res.data.userId);
+      console.log("로그인 및 요청 성공", res.data);
 
-      alert("Login successed!");
+      // alert("Login successed!");
       setLogin(false);
       setChange(false);
     } catch (err) {

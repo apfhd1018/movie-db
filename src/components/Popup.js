@@ -1,17 +1,25 @@
 import React, { useState } from "react";
 import { Button } from "antd";
-import Heart from "react-animated-heart";
+import Favorite from "./Section/Favorite";
 
 function Popup({ results, closePopup }) {
-  const [isClick, setClick] = useState(false);
-
   return (
     <div className="popup">
       <div className="btn-position">
         <h2>
           {results.Title} ({results.Year})
         </h2>
-        <p className="rating">Rating : {results.imdbRating}</p>
+        <div style={{ display: "flex", position: "relative" }}>
+          <div>
+            <p className="rating">Rating : {results.imdbRating}</p>
+          </div>
+          <Favorite
+            userFrom={sessionStorage.getItem("userId")}
+            movieId={results.imdbID}
+            movieTitle={results.Title}
+            moviePoster={results.Poster}
+          />
+        </div>
         <div className="poster">
           <img src={results.Poster} alt="" />
           <div className="poster-right">
@@ -27,12 +35,6 @@ function Popup({ results, closePopup }) {
               <span>ACTOR</span> <br />
               {results.Actors}
             </p>
-            <div>
-              <div className="App">
-                <Heart isClick={isClick} onClick={() => setClick(!isClick)} />
-                <div className="add">Add My Favorite!</div>
-              </div>
-            </div>
           </div>
         </div>
         <div className="close-popup">
