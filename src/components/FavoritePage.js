@@ -9,10 +9,13 @@ const FavoritePage = () => {
   const accessToken = sessionStorage.getItem("accessToken");
 
   useEffect(() => {
+    // 렌더링 될때마다 movie list 업데이트함
     fetchFavoriteMovie();
   }, []);
 
   const fetchFavoriteMovie = () => {
+    // variable변수통해 userFrom에 대한 데이터를 favorites 로 가져옴
+    // favoriteMovies 배열에 데이터 넣음
     axios
       .post("http://localhost:5000/api/private/getFavoriteMovie", variable, {
         headers: {

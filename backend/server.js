@@ -25,9 +25,11 @@ connection.once("open", () => {
 // Import Route
 const usersRouter = require("./routes/users");
 const privateRouter = require("./routes/private");
+const likeRouter = require("./routes/like");
 
 app.use("/api/users", usersRouter);
 app.use("/api/private", privateRouter);
+app.use("/api/like", likeRouter);
 
 // listen 메소드가 실행될 때 첫번째 인자로 리스닝 성공하면 뒤 코드 실행
 app.listen(port, () => {
