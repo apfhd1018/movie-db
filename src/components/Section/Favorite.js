@@ -10,7 +10,7 @@ const Favorite = ({
   setClick,
   isClick,
 }) => {
-  const [favorited, setFavorited] = useState(false);
+  const [favorited, setFavorited] = useState(true);
 
   const variable = {
     userFrom: sessionStorage.getItem("userId"),
@@ -20,22 +20,21 @@ const Favorite = ({
   };
   const accessToken = sessionStorage.getItem("accessToken");
 
-  useEffect(() => {
-    //  좋아요를 누른 기록이 있으면 favorited => true
-    axios
-      .post("http://localhost:5000/api/private/favorited", variable, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-      .then((res) => {
-        if (res.data.success) {
-          setFavorited(res.data.favorited);
-        } else {
-          alert("Favorite 정보 가져오지 못함!");
-        }
-      });
-  }, []);
+  //  좋아요를 누른 기록이 있으면 favorited => true
+  axios
+    .post("http://localhost:5000/api/private/favorited", variable, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    .then((res) => {
+      if (res.data.success) {
+        // 데이터 있으면 favorited=>true , 없으면 favorited=>false
+        setFavorited(res.data.favorited);
+      } else {
+        alert("Favorite 정보 가져오지 못함!");
+      }
+    });
 
   // ===================================
   //   하트를 눌렀을때 발생하는 이벤트
@@ -55,8 +54,8 @@ const Favorite = ({
         )
         .then((res) => {
           if (res.data.success) {
-            setClick(false);
-            setFavorited(false);
+            setClick(!favorited);
+            setFavorited(!favorited);
           } else {
             console.log("favorite콜렉션에서 제거하지 못함");
           }
@@ -72,8 +71,8 @@ const Favorite = ({
         })
         .then((res) => {
           if (res.data.success) {
-            setClick(true);
-            setFavorited(true);
+            setClick(!favorited);
+            setFavorited(!favorited);
           } else {
             console.log("추가하지 못했습니다");
           }
