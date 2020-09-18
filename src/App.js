@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import "./App.css";
 import Search from "./components/Search";
 import axios from "axios";
@@ -24,6 +24,8 @@ function App() {
   const [favorite, setFavorite] = useState(false);
   // 로그인 => 로그아웃 글자 변경
   const [change, setChange] = useState(true);
+  // 좋아요 하트버튼 On/oFF
+  const [isClick, setClick] = useState(false);
 
   // search 검색창 포커스
   const inputRef = useRef();
@@ -102,7 +104,7 @@ function App() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      // console.log("성공(accessToken): ", accessToken);
+      console.log("favorite 모달 : ", res);
       // 에러발생안하면 Favorite리스트 열고 닫기 가능
       setFavorite(!favorite);
     } catch (err) {
@@ -139,6 +141,7 @@ function App() {
       });
       sessionStorage.removeItem("accessToken");
       sessionStorage.removeItem("refreshToken");
+      sessionStorage.removeItem("userId");
       setChange(true);
       console.log("로그아웃 res : ", res);
     } catch (err) {
@@ -196,9 +199,16 @@ function App() {
         openPopup={openPopup}
         toggle={toggle}
         setToggle={setToggle}
+        setClick={setClick}
+        isClick={isClick}
       />
       {toggle === true ? (
-        <Popup results={moviedb.selected} closePopup={closePopup} />
+        <Popup
+          results={moviedb.selected}
+          closePopup={closePopup}
+          setClick={setClick}
+          isClick={isClick}
+        />
       ) : null}
     </div>
   );

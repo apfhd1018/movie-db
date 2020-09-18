@@ -21,37 +21,25 @@ router.get("/favorite", authenticateToken, async (req, res) => {
 });
 
 // ==============================================
-//   좋아요 누를 때 숫자 증감
-// ==============================================
-router.post("/favoriteNumber", authenticateToken, (req, res) => {
-  //Favorite정보를 Movie ID를 통해 찾는다
-  Favorite.find({ movieId: req.body.movieId }).exec((err, favorite) => {
-    if (err) return res.status(400).send("영화정보없음!" + err);
-    res.json({ success: true, favoriteNumber: favorite.length });
-  });
-});
-
-// ==============================================
 //   좋아요를 최초로 눌렀는지, 이미 눌렀는지 확인
 // ==============================================
 router.post("/favorited", authenticateToken, (req, res) => {
   // Favorite정보를 Favorite 콜렉션의 Movie ID와 userfrom을 통해 찾는다.
-  Favorite.find({ movieId: req.body.movieId, useFrom: req.body.useFrom }).exec(
-    (err, favorited) => {
-      if (err) return res.status(400).send("유저에 대한 영화정보없음 " + err);
+  Favorite.find({
+    movieId: req.body.movieId,
+    userFrom: req.body.userFrom,
+  }).exec((err, favorited) => {
+    if (err) return res.status(400).send("유저에 대한 영화정보없음 " + err);
 
-      // 이미 유저가 favorite리스트에 추가했을경우 확인
-      let result = false; // 아직 리스트 추가안함
-      if (favorited.length !== 0) {
-        //영화 정보에 대한 배열Length가 0이 아닐때 (추가됐을때)
-        result = true;
-      }
-      //favorited값으로 리스트 추가 유무 전송 result=true 일때: 추가됨 false일떄: 추가안됨
-      res
-        .status(200)
-        .json({ success: true, favorited: result, isClick: result });
+    // 이미 유저가 favorite리스트에 추가했을경우 확인
+    let result = false; // 아직 리스트 추가안함
+    if (favorited.length !== 0) {
+      //영화 정보에 대한 배열Length가 0이 아닐때 (추가됐을때)
+      result = true;
     }
-  );
+    //favorited값으로 리스트 추가 유무 전송 result=true 일때: 추가됨 false일떄: 추가안됨
+    res.status(200).json({ success: true, favorited: result });
+  });
 });
 
 // ==============================================
@@ -91,13 +79,21 @@ router.post("/getFavoriteMovie", authenticateToken, (req, res) => {
     return res.status(200).json({ success: true, favorites });
   });
 });
-// 좋아요 상태 유지
-// router.post("/getLikes", authenticateToken, (req, res) => {
-//   let userCondition = { movieId: req.body.movieId };
 
-//   Like.find(userCondition).exec((err, likes) => {
-//     if (err) return res.status(400).send(err);
-//     res.status(200).json({ success: true, likes });
-//   });
-// });
+// ==============================================
+//   좋아요 상태 확인
+// ==============================================
+router.post("/getLike", authenticateToken, (req, res) => {
+  Favorite.find({
+    userFrom: req.body.userFrom,
+    movieId: req.body.movieId,
+  }).exec((err, like) => {
+    if (err) return res.status(400).send("좋아요정보 못가져옴" + err);
+    let result = false;
+    if (like.length !== 0) {
+      result = true;
+    }
+    return res.status(200).json({ success: true, likeData: result });
+  });
+});
 module.exports = router;

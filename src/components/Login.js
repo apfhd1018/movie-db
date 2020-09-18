@@ -32,15 +32,13 @@ const Login = ({ login, setLogin, openRegister, setChange }) => {
         "refreshToken",
         res.data.refreshToken
       );
-      // const userId = sessionStorage.setItem("userId", res.data.userId);
+      const userId = sessionStorage.setItem("userId", res.data.userId);
       console.log("로그인 및 요청 성공", res.data);
-
-      // alert("Login successed!");
-      setLogin(false);
-      setChange(false);
+      setLogin(false); // 로그인 창 닫기
+      setChange(false); // sign-in => log out 글자 바꿈
     } catch (err) {
       alert("Login failed");
-      console.log(err);
+      console.log("로그인에러 : ", err);
     }
   };
 

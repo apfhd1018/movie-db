@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "antd";
 import Favorite from "./Section/Favorite";
 
-function Popup({ results, closePopup }) {
+function Popup({ results, closePopup, setClick, isClick }) {
   return (
     <div className="popup">
       <div className="btn-position">
@@ -18,6 +18,8 @@ function Popup({ results, closePopup }) {
             movieId={results.imdbID}
             movieTitle={results.Title}
             moviePoster={results.Poster}
+            setClick={setClick}
+            isClick={isClick}
           />
         </div>
         <div className="poster">

@@ -26,7 +26,7 @@ const FavoritePage = () => {
         if (res.data.success) {
           setFavoriteMovies(res.data.favorites);
         } else {
-          alert("Failed to get favorited videos");
+          console.log("Failed to get favorited videos");
         }
       });
   };
@@ -34,7 +34,7 @@ const FavoritePage = () => {
   const onClickRemove = (movieId) => {
     const variable = {
       movieId: movieId,
-      userId: sessionStorage.getItem("userId"),
+      userFrom: sessionStorage.getItem("userId"),
     };
 
     axios
@@ -46,8 +46,9 @@ const FavoritePage = () => {
       .then((res) => {
         if (res.data.success) {
           fetchFavoriteMovie();
+          console.log("삭제성공");
         } else {
-          alert("favorite콜렉션에서 제거하지 못함");
+          console.log("favorite콜렉션에서 제거하지 못함");
         }
       });
   };
