@@ -46,7 +46,7 @@ const Result = ({
   };
 
   return (
-    <Col lg={8} md={12} xs={24} className="result">
+    <Col lg={8} md={12} xs={12} className="result">
       <div onClick={popupToggle}>
         <img src={result.Poster} alt="poster" />
       </div>

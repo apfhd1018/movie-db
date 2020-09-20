@@ -14,7 +14,7 @@ const Search = (props) => {
           ref={props.inputRef}
         />
         <button onClick={props.handleButton}>
-          <SearchOutlined style={{ paddingRight: "8px" }} />
+          <SearchOutlined className="search-icon" />
           Search
         </button>
       </div>
