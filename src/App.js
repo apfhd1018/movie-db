@@ -122,12 +122,11 @@ function App() {
       // 세션스토리지에 저장
       sessionStorage.setItem("accessToken", accessToken);
       // private경로 재요청
-      const res2 = await axios.get("http://localhost:5000/api/private", {
+      await axios.get("http://localhost:5000/api/private", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      // console.log("2번째응답", res2);
     }
   };
   //====================================

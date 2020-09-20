@@ -24,16 +24,10 @@ const Login = ({ login, setLogin, openRegister, setChange }) => {
         values
       );
       // 서버에서 res.json과 같은 형태로 전송을 해야 클라이언트에서 사용 가능!!
-      const accessToken = sessionStorage.setItem(
-        "accessToken",
-        res.data.accessToken
-      );
-      const refreshToken = sessionStorage.setItem(
-        "refreshToken",
-        res.data.refreshToken
-      );
-      const userId = sessionStorage.setItem("userId", res.data.userId);
-      console.log("로그인 및 요청 성공", res.data);
+      sessionStorage.setItem("accessToken", res.data.accessToken);
+      sessionStorage.setItem("refreshToken", res.data.refreshToken);
+      sessionStorage.setItem("userId", res.data.userId);
+      console.log("로그인 및 요청 성공");
       setLogin(false); // 로그인 창 닫기
       setChange(false); // sign-in => log out 글자 바꿈
     } catch (err) {
