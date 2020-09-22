@@ -30,7 +30,7 @@ function App() {
   // search 검색창 포커스
   const inputRef = useRef();
 
-  const apiURL = "http://www.omdbapi.com/?apikey=ec6e8a00";
+  const apiURL = "https://www.omdbapi.com/?apikey=ec6e8a00";
 
   // 검색하는 영화제목 담기
   const handleInput = (e) => {
