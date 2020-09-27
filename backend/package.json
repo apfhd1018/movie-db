@@ -14,8 +14,7 @@
     "nodemon": "^2.0.4"
   },
   "scripts": {
-    "start:dev": "nodemon server --prefix backend",
-    "start": "node server.js --prefix backend",
-    "heroku-postbuild": "YARN_CONFIG_PRODUCTION=false yarn install --prefix frontend && yarn build --prefix frontend"
+    "start:dev": "nodemon server",
+    "start": "node server.js"
   }
 }

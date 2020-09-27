@@ -7,7 +7,7 @@ const Search = (props) => {
       <div className="searchbox-in">
         <input
           type="text"
-          placeholder="영화제목은 영어로 검색하세요"
+          placeholder="영어로 검색하세요"
           className="searchbox"
           onChange={props.handleInput}
           onKeyPress={props.search}

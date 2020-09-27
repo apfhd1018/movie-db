@@ -32,17 +32,6 @@ app.use("/api/users", usersRouter);
 app.use("/api/private", privateRouter);
 app.use("/api/like", likeRouter);
 
-if (process.env.NODE_ENV === "production") {
-  // Set static folder
-  // All the javascript and css files will be read and served from this folder
-  app.use(express.static("frontend/build"));
-
-  // index.html for all page routes
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../frontend", "build", "index.html"));
-  });
-}
-
 // listen 메소드가 실행될 때 첫번째 인자로 리스닝 성공하면 뒤 코드 실행
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
